@@ -1,9 +1,10 @@
 <?php
-
 require_once 'config\db.php';
 
 $message = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $firstName = trim($_POST['emp_first_name']);
     $lastName  = trim($_POST['emp_last_name']);
     $role      = trim($_POST['emp_role']);
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $message = "Please fill in all fields.";
     }
+
 }
 
 try {
@@ -47,6 +49,8 @@ try {
 </head>
 <body>
 
+
+
 <div class="container">
     <h2>Database Connection & Table Test</h2>
     <p style="color: green; font-weight: bold;">✔ Connected to database and table checked/created successfully via `db.php`!</p>
@@ -54,7 +58,9 @@ try {
     <?php if (!empty($message)): ?>
         <div class="message"><?php echo htmlspecialchars($message); ?></div>
     <?php endif; ?>
-
+<div style="margin-bottom: 20px;">
+    <a href="search.php" class="btn btn-blue" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Search Employees</a>
+</div>
     <h3>Add Test Employee</h3>
     <form method="POST" action="">
         <div class="form-group">
@@ -71,37 +77,40 @@ try {
         </div>
         <button type="submit">Save Employee</button>
     </form>
-
     <h3 style="margin-top: 30px;">Employee List</h3>
     <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Role</th>
-                <th>Date Created</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (count($employees) > 0): ?>
-                <?php foreach ($employees as$emp): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($emp['emp_id']); ?></td>
-                        <td><?php echo htmlspecialchars($emp['emp_first_name']); ?></td>
-                        <td><?php echo htmlspecialchars($emp['emp_last_name']); ?></td>
-                        <td><?php echo htmlspecialchars($emp['emp_role']); ?></td>
-                        <td><?php echo htmlspecialchars($emp['emp_date_created']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Role</th>
+            <th>Date Created</th>
+            <th>Actions</th> <!-- Column Header for Actions -->
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (count($employees) > 0): ?>
+            <?php foreach ($employees as $emp): ?>
                 <tr>
-                    <td colspan="5" style="text-align: center;">No employees found in the database. Use the form above to add one!</td>
+                    <td><?php echo htmlspecialchars($emp['emp_id']); ?></td>
+                    <td><?php echo htmlspecialchars($emp['emp_first_name']); ?></td>
+                    <td><?php echo htmlspecialchars($emp['emp_last_name']); ?></td>
+                    <td><?php echo htmlspecialchars($emp['emp_role']); ?></td>
+                    <td><?php echo htmlspecialchars($emp['emp_date_created']); ?></td>
+                    <td>
+                        <a href="edit.php?id=<?php echo $emp['emp_id']; ?>" class="btn btn-warning" style="background-color: #ffc107; color: #212529; padding: 4px 10px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 14px;">Edit</a>
+                    </td>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6" style="text-align: center;">No employees found in the database.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
 </div>
-
 </body>
 </html>
+
