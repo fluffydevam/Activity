@@ -2,24 +2,6 @@
 require_once 'config/db.php';
 
 $message = "";
-$emp_id = $_GET['id'] ?? null;
-
-if (!$emp_id) {
-    header("Location: index.php");
-    exit();
-}
-
-try {
-    $stmt = $pdo->prepare("SELECT * FROM employee WHERE emp_id = ?");
-    $stmt->execute([$emp_id]);
-    $employee = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$employee) {
-        die("Employee not found.");
-    }
-} catch (PDOException $e) {
-    die("Error fetching employee details: " . $e->getMessage());
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = trim($_POST['emp_first_name'] ?? '');
@@ -28,13 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($firstName) && !empty($lastName) && !empty($role)) {
         try {
-            $stmt = $pdo->prepare("UPDATE employee SET emp_first_name = ?, emp_last_name = ?, emp_role = ? WHERE emp_id = ?");
-            $stmt->execute([$firstName, $lastName, $role, $emp_id]);
+            $stmt = $pdo->prepare("INSERT INTO employee (emp_first_name, emp_last_name, emp_role) VALUES (?, ?, ?)");
+            $stmt->execute([$firstName, $lastName, $role]);
             
-            header("Location: index.php?msg=" . urlencode("Employee updated successfully!"));
+            header("Location: index.php?msg=" . urlencode("New employee added successfully!"));
             exit();
         } catch (PDOException $e) {
-            $message = "Error updating employee: " . $e->getMessage();
+            $message = "Error adding employee: " . $e->getMessage();
         }
     } else {
         $message = "Please fill in all fields.";
@@ -46,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Employee</title>
+    <title>Add Employee</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
@@ -64,28 +46,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="card card-custom">
         <div class="card-header-custom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Edit Employee Details</h5>
+            <h5 class="mb-0">Add New Employee</h5>
             <a href="index.php" class="btn btn-sm btn-custom-outline">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
         </div>
         <div class="card-body p-4">
-            <form method="POST" action="edit.php?id=<?php echo urlencode($emp_id); ?>">
+            <form method="POST" action="add.php">
                 <div class="mb-3">
                     <label class="form-label text-secondary fw-medium">First Name</label>
-                    <input type="text" name="emp_first_name" class="form-control" value="<?php echo htmlspecialchars($employee['emp_first_name']); ?>" required>
+                    <input type="text" name="emp_first_name" class="form-control" placeholder="Enter first name" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-secondary fw-medium">Last Name</label>
-                    <input type="text" name="emp_last_name" class="form-control" value="<?php echo htmlspecialchars($employee['emp_last_name']); ?>" required>
+                    <input type="text" name="emp_last_name" class="form-control" placeholder="Enter last name" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-secondary fw-medium">Role</label>
-                    <input type="text" name="emp_role" class="form-control" value="<?php echo htmlspecialchars($employee['emp_role']); ?>" required>
+                    <input type="text" name="emp_role" class="form-control" placeholder="Enter employee role" required>
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a href="index.php" class="btn btn-custom-outline px-3">Cancel</a>
-                    <button type="submit" class="btn btn-custom-dark px-4">Update Details</button>
+                    <button type="submit" class="btn btn-custom-dark px-4">Save Employee</button>
                 </div>
             </form>
         </div>
